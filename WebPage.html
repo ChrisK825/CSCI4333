@@ -186,11 +186,16 @@ function isAdmin(){
 return currentUser && currentUser.role==="admin";
 }
 
+/* DOM SAFE GET */
+const $ = (id)=>document.getElementById(id);
+
 /* LOAD OPTIONS */
 function loadOptions(){
 
 ["category","signupRole","reviewProvider"].forEach(id=>{
-let el=document.getElementById(id);
+let el=$(id);
+if(!el) return;
+
 el.innerHTML="";
 trades.forEach(t=>{
 let opt=document.createElement("option");
@@ -284,18 +289,18 @@ function logout(){
 location.reload();
 }
 
-/* CREATE JOB (FIXED CLIENT BUG) */
+/* CREATE JOB */
 function submitRequest(e){
 e.preventDefault();
 
-let clientName = document.getElementById("name").value.trim();
+let clientName = $("name").value.trim();
 
 jobs.push({
 id:Date.now(),
 client:clientName,
-category:category.value,
-budget:budget.value,
-desc:desc.value,
+category:$("category").value,
+budget:$("budget").value,
+desc:$("desc").value,
 status:"Pending",
 acceptedBy:null,
 paymentStatus:"Unpaid"
@@ -341,17 +346,11 @@ Status: ${job.status}<br>
 Provider: ${job.acceptedBy || "None"}<br>
 Payment: ${job.paymentStatus}
 
-${canAccept ? `
-<button onclick="accept(${job.id})">Accept</button>
-`:""}
+${canAccept ? `<button onclick="accept(${job.id})">Accept</button>`:""}
 
-${job.acceptedBy===currentUser.name && job.status==="In Progress" ? `
-<button onclick="complete(${job.id})">Complete</button>
-`:""}
+${job.acceptedBy===currentUser.name && job.status==="In Progress" ? `<button onclick="complete(${job.id})">Complete</button>`:""}
 
-${job.status==="Completed" && job.paymentStatus==="Unpaid" ? `
-<button onclick="pay(${job.id})">Pay</button>
-`:""}
+${job.status==="Completed" && job.paymentStatus==="Unpaid" ? `<button onclick="pay(${job.id})">Pay</button>`:""}
 `;
 
 jobList.appendChild(li);
