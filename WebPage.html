@@ -6,67 +6,86 @@
 <title>MatchingSupplyWithDemands.com</title>
 
 <style>
-body{font-family:Arial;margin:0;background:#f4f6f8}
-header{background:#1e3a5f;color:#fff;padding:20px;text-align:center}
-nav{display:flex;justify-content:center;gap:15px;background:#16304d;padding:10px}
-nav a{color:#fff;text-decoration:none;font-weight:bold}
-.container{max-width:1100px;margin:auto;padding:20px}
-.card{background:#fff;padding:20px;border-radius:12px;margin-top:20px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-input,select,textarea{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid #ccc}
-button{background:#1e3a5f;color:#fff;padding:10px;border:none;border-radius:8px;cursor:pointer}
-.hidden{display:none}
-.logout-btn{background:#b22222;margin-top:10px}
-</style>
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f8;
+}
 
+header{
+background:#1e3a5f;
+color:#fff;
+padding:20px;
+text-align:center;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+padding:20px;
+}
+
+.card{
+background:#fff;
+padding:20px;
+border-radius:12px;
+margin-top:20px;
+box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+input,select,textarea{
+width:100%;
+padding:10px;
+margin:8px 0;
+border-radius:8px;
+border:1px solid #ccc;
+box-sizing:border-box;
+}
+
+button{
+background:#1e3a5f;
+color:#fff;
+padding:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-top:5px;
+}
+
+button:hover{opacity:.9;}
+
+.hidden{display:none;}
+.delete-btn{background:#b22222;}
+.logout-btn{background:#b22222;}
+</style>
 </head>
 
 <body>
 
 <header>
 <h1>MatchingSupplyWithDemands.com</h1>
-<p>Role-Based Marketplace System</p>
 </header>
-
-<nav>
-<a href="#request">Request</a>
-<a href="#login">Login</a>
-<a href="#signup">Sign Up</a>
-<a href="#admin">Admin</a>
-<a href="#review">Reviews</a>
-</nav>
 
 <div class="container">
 
 <!-- REQUEST -->
-<section id="request" class="card">
-<h2>Create Service Request</h2>
+<section class="card">
+<h2>Create Job Request</h2>
+
 <form onsubmit="submitRequest(event)">
-<input id="name" placeholder="Name" required>
-
-<select id="category">
-<option>Plumbing</option>
-<option>Electrical</option>
-<option>HVAC</option>
-<option>Cleaning</option>
-<option>Mechanic</option>
-<option>Carpenter</option>
-</select>
-
-<input type="number" id="budget" placeholder="Budget">
-<textarea id="desc" placeholder="Describe job"></textarea>
-
+<input id="name" placeholder="Client Name" required>
+<select id="category"></select>
+<input id="budget" type="number" placeholder="Budget">
+<textarea id="desc" placeholder="Job description"></textarea>
 <button type="submit">Submit</button>
-<p id="msg"></p>
 </form>
 </section>
 
 <!-- LOGIN -->
-<section id="login" class="card">
+<section class="card">
 <h2>Login</h2>
-
-<input id="loginName" placeholder="Enter your name">
-<input type="password" id="loginPass" placeholder="Password = 123">
-
+<input id="loginName" placeholder="Name">
+<input id="loginPass" type="password" placeholder="Password">
 <button onclick="login()">Login</button>
 </section>
 
@@ -76,59 +95,55 @@ button{background:#1e3a5f;color:#fff;padding:10px;border:none;border-radius:8px;
 <p id="welcome"></p>
 <button class="logout-btn" onclick="logout()">Logout</button>
 
-<h3>Available Jobs</h3>
+<h3>Jobs</h3>
 <ul id="jobList"></ul>
 </section>
 
 <!-- SIGNUP -->
-<section id="signup" class="card">
-<h2>Sign Up (Create Trade Account)</h2>
-
-<input id="signupName" placeholder="Your Name">
-
-<select id="signupRole">
-<option>Plumbing</option>
-<option>Electrical</option>
-<option>HVAC</option>
-<option>Cleaning</option>
-<option>Mechanic</option>
-<option>Carpenter</option>
-</select>
-
+<section class="card">
+<h2>Sign Up</h2>
+<input id="signupName" placeholder="Name">
+<input id="signupPass" type="password" placeholder="Password">
+<select id="signupRole"></select>
 <button onclick="signup()">Create Account</button>
 </section>
 
 <!-- ADMIN -->
-<section id="admin" class="card">
+<section id="admin" class="card hidden">
 <h2>ADMIN PANEL</h2>
+
+<h3>Create New Trade</h3>
+<input id="newTrade" placeholder="New trade">
+<button onclick="addTrade()">Add Trade</button>
+
+<h3>Trades</h3>
+<ul id="tradeList"></ul>
 
 <h3>Users</h3>
 <ul id="userList"></ul>
 
-<h3>Jobs</h3>
+<h3>All Jobs</h3>
 <ul id="adminJobs"></ul>
 
 <h3>Reviews</h3>
 <ul id="adminReviews"></ul>
+
+<h3>Payments</h3>
+<p id="totalRevenue"></p>
+<ul id="adminPayments"></ul>
 </section>
 
 <!-- REVIEWS -->
-<section id="review" class="card">
+<section class="card">
 <h2>Reviews</h2>
 
-<select id="reviewTrade">
-<option>Plumbing</option>
-<option>Electrical</option>
-<option>HVAC</option>
-<option>Cleaning</option>
-<option>Mechanic</option>
-<option>Carpenter</option>
-</select>
-
-<select id="stars">
-<option>5 Stars</option>
-<option>4 Stars</option>
-<option>3 Stars</option>
+<select id="reviewProvider"></select>
+<select id="reviewStars">
+<option>5</option>
+<option>4</option>
+<option>3</option>
+<option>2</option>
+<option>1</option>
 </select>
 
 <textarea id="reviewText"></textarea>
@@ -142,237 +157,395 @@ button{background:#1e3a5f;color:#fff;padding:10px;border:none;border-radius:8px;
 
 <script>
 
-/* STORAGE */
-let serviceRequests = JSON.parse(localStorage.getItem("requests")) || [];
-let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
-let users = JSON.parse(localStorage.getItem("users")) || [
-  {id:1,name:"Admin",role:"admin"}
+/* DATA */
+let trades = JSON.parse(localStorage.getItem("trades")) || [
+"Plumbing","Electrical","HVAC","Cleaning","Mechanic","Carpenter"
 ];
+
+let users = JSON.parse(localStorage.getItem("users")) || [
+{id:1,name:"Admin",password:"admin123",role:"admin"}
+];
+
+let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+let payments = JSON.parse(localStorage.getItem("payments")) || [];
+let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
 
 let currentUser = null;
 
-/* ENSURE ADMIN EXISTS */
-if(!users.some(u=>u.role==="admin")){
-  users.push({id:1,name:"Admin",role:"admin"});
+/* SAVE */
+function save(){
+localStorage.setItem("users",JSON.stringify(users));
+localStorage.setItem("jobs",JSON.stringify(jobs));
+localStorage.setItem("payments",JSON.stringify(payments));
+localStorage.setItem("reviews",JSON.stringify(reviews));
+localStorage.setItem("trades",JSON.stringify(trades));
 }
 
 /* ADMIN CHECK */
 function isAdmin(){
-  return currentUser && currentUser.role === "admin";
+return currentUser && currentUser.role==="admin";
+}
+
+/* LOAD OPTIONS */
+function loadOptions(){
+
+["category","signupRole","reviewProvider"].forEach(id=>{
+let el=document.getElementById(id);
+el.innerHTML="";
+trades.forEach(t=>{
+let opt=document.createElement("option");
+opt.value=t;
+opt.textContent=t;
+el.appendChild(opt);
+});
+});
+
+renderTradeList();
+}
+
+/* TRADE LIST */
+function renderTradeList(){
+if(!isAdmin()) return;
+
+tradeList.innerHTML="";
+
+trades.forEach((t,i)=>{
+let li=document.createElement("li");
+li.innerHTML=`
+${t}
+<button class="delete-btn" onclick="deleteTrade(${i})">Delete</button>
+`;
+tradeList.appendChild(li);
+});
+}
+
+/* DELETE TRADE */
+function deleteTrade(i){
+if(!isAdmin()) return;
+trades.splice(i,1);
+save();
+loadOptions();
+}
+
+/* ADD TRADE */
+function addTrade(){
+if(!isAdmin()) return;
+
+let t = newTrade.value.trim();
+if(!t) return;
+
+if(!trades.includes(t)){
+trades.push(t);
+save();
+loadOptions();
+alert("Trade added");
+}
+newTrade.value="";
 }
 
 /* SIGNUP */
 function signup(){
-  let name=document.getElementById("signupName").value;
-  let role=document.getElementById("signupRole").value;
-
-  if(!name){alert("Enter name");return;}
-
-  if(users.some(u=>u.name === name)){
-    alert("User already exists");
-    return;
-  }
-
-  users.push({
-    id:Date.now(),
-    name,
-    role
-  });
-
-  localStorage.setItem("users",JSON.stringify(users));
-  alert("Account created!");
-  loadUsers();
+users.push({
+id:Date.now(),
+name:signupName.value,
+password:signupPass.value,
+role:signupRole.value
+});
+save();
+alert("Account created");
 }
 
 /* LOGIN */
 function login(){
-  let name=document.getElementById("loginName").value;
-  let pass=document.getElementById("loginPass").value;
 
-  if(pass!=="123"){
-    alert("Password is 123");
-    return;
-  }
+let user = users.find(u=>
+u.name===loginName.value &&
+u.password===loginPass.value
+);
 
-  let user = users.find(u=>u.name===name);
+if(!user){alert("Wrong login");return;}
 
-  if(!user){
-    alert("User not found. Please sign up.");
-    return;
-  }
+currentUser=user;
 
-  currentUser = user;
+dashboard.classList.remove("hidden");
+admin.classList.toggle("hidden", !isAdmin());
 
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
+welcome.innerText=`Logged in as ${user.name} (${user.role})`;
 
-  document.getElementById("welcome").innerText =
-    "Logged in as " + user.name + " (" + user.role + ")";
-
-  loadJobs(user.role);
+loadJobs();
+loadUsers();
+loadAdminJobs();
+loadPayments();
+loadReviews();
 }
 
 /* LOGOUT */
 function logout(){
-  currentUser=null;
-  document.getElementById("dashboard").classList.add("hidden");
-  document.getElementById("login").classList.remove("hidden");
+location.reload();
 }
 
-/* REQUEST */
+/* CREATE JOB (FIXED CLIENT BUG) */
 function submitRequest(e){
 e.preventDefault();
 
-serviceRequests.push({
+let clientName = document.getElementById("name").value.trim();
+
+jobs.push({
 id:Date.now(),
-name:document.getElementById("name").value,
-category:document.getElementById("category").value,
-budget:document.getElementById("budget").value,
-desc:document.getElementById("desc").value,
-acceptedBy:null
+client:clientName,
+category:category.value,
+budget:budget.value,
+desc:desc.value,
+status:"Pending",
+acceptedBy:null,
+paymentStatus:"Unpaid"
 });
 
-localStorage.setItem("requests",JSON.stringify(serviceRequests));
+save();
 
-document.getElementById("msg").innerText="Saved!";
+alert("🔔 New job created by " + clientName);
+
+loadJobs();
+loadAdminJobs();
+loadOptions();
+
 e.target.reset();
 }
 
-/* JOBS */
-function loadJobs(role){
-let list=document.getElementById("jobList");
-list.innerHTML="";
+/* LOAD JOBS */
+function loadJobs(){
 
-serviceRequests
-.filter(r=>r.category===role)
-.forEach(r=>{
+if(!currentUser) return;
+
+jobList.innerHTML="";
+
+jobs.forEach(job=>{
+
+let canSee = isAdmin() || job.category===currentUser.role;
+if(!canSee) return;
+
 let li=document.createElement("li");
 
+let canAccept =
+job.acceptedBy===null &&
+job.status==="Pending" &&
+currentUser.role===job.category;
+
 li.innerHTML=`
-${r.desc} - $${r.budget}
-<br>
-${r.acceptedBy ? "Accepted by: " + r.acceptedBy : ""}
-<br>
-<button onclick="acceptJob(${r.id})">Accept</button>
+<hr>
+<strong>${job.category}</strong><br>
+Client: ${job.client || "Unknown"}<br>
+${job.desc}<br>
+Budget: $${job.budget}<br>
+Status: ${job.status}<br>
+Provider: ${job.acceptedBy || "None"}<br>
+Payment: ${job.paymentStatus}
+
+${canAccept ? `
+<button onclick="accept(${job.id})">Accept</button>
+`:""}
+
+${job.acceptedBy===currentUser.name && job.status==="In Progress" ? `
+<button onclick="complete(${job.id})">Complete</button>
+`:""}
+
+${job.status==="Completed" && job.paymentStatus==="Unpaid" ? `
+<button onclick="pay(${job.id})">Pay</button>
+`:""}
 `;
 
-list.appendChild(li);
+jobList.appendChild(li);
 });
 }
 
-/* ACCEPT JOB */
-function acceptJob(id){
-let job = serviceRequests.find(j=>j.id===id);
+/* ACCEPT */
+function accept(id){
+let job = jobs.find(j=>j.id===id);
+if(job.acceptedBy) return;
 
-if(job.acceptedBy){
-alert("Already accepted by " + job.acceptedBy);
-return;
+job.acceptedBy=currentUser.name;
+job.status="In Progress";
+
+save();
+loadJobs();
 }
 
-job.acceptedBy = currentUser.name;
+/* COMPLETE */
+function complete(id){
+let job = jobs.find(j=>j.id===id);
+job.status="Completed";
 
-localStorage.setItem("requests",JSON.stringify(serviceRequests));
+save();
+loadJobs();
+}
 
-loadJobs(currentUser.role);
+/* PAY */
+function pay(id){
+
+let job = jobs.find(j=>j.id===id);
+
+job.paymentStatus="Paid";
+
+payments.push({
+id:Date.now(),
+jobId:job.id,
+amount:job.budget,
+client:job.client,
+provider:job.acceptedBy
+});
+
+save();
+
+alert("Payment complete");
+loadPayments();
+loadJobs();
 }
 
 /* USERS */
 function loadUsers(){
-let list=document.getElementById("userList");
-list.innerHTML="";
+if(!isAdmin()) return;
+
+userList.innerHTML="";
 
 users.forEach(u=>{
+
 let li=document.createElement("li");
 
 li.innerHTML=`
 ${u.name} (${u.role})
-<button onclick="deleteUser(${u.id})">Delete</button>
+${u.role!=="admin"
+? `<button class="delete-btn" onclick="deleteUser(${u.id})">Delete</button>`
+:""}
 `;
 
-list.appendChild(li);
+userList.appendChild(li);
 });
 }
 
-/* DELETE USER */
 function deleteUser(id){
-
-if(!isAdmin()){
-alert("Only admin can delete users");
-return;
-}
-
-let user = users.find(u=>u.id===id);
-
-if(user.role==="admin"){
-alert("Admin cannot be deleted.");
-return;
-}
-
+if(!isAdmin()) return;
 users=users.filter(u=>u.id!==id);
-localStorage.setItem("users",JSON.stringify(users));
+save();
 loadUsers();
+}
+
+/* ADMIN JOBS */
+function loadAdminJobs(){
+if(!isAdmin()) return;
+
+adminJobs.innerHTML="";
+
+jobs.forEach(j=>{
+
+let li=document.createElement("li");
+
+li.innerHTML=`
+<strong>${j.category}</strong><br>
+Client: ${j.client || "Unknown"}<br>
+${j.desc}<br>
+Status: ${j.status}<br>
+<button class="delete-btn" onclick="deleteJob(${j.id})">Delete</button>
+`;
+
+adminJobs.appendChild(li);
+});
+}
+
+function deleteJob(id){
+if(!isAdmin()) return;
+jobs=jobs.filter(j=>j.id!==id);
+save();
+loadJobs();
+loadAdminJobs();
+}
+
+/* PAYMENTS */
+function loadPayments(){
+if(!isAdmin()) return;
+
+adminPayments.innerHTML="";
+
+let total=0;
+
+payments.forEach(p=>{
+total+=Number(p.amount);
+
+let li=document.createElement("li");
+
+li.innerHTML=`
+Job ${p.jobId}<br>
+Amount: $${p.amount}<br>
+Client: ${p.client}<br>
+Provider: ${p.provider}<br>
+<hr>
+`;
+
+adminPayments.appendChild(li);
+});
+
+totalRevenue.innerText="Total Revenue: $"+total.toFixed(2);
 }
 
 /* REVIEWS */
 function submitReview(){
+
 reviews.push({
-trade:document.getElementById("reviewTrade").value,
-stars:document.getElementById("stars").value,
-text:document.getElementById("reviewText").value
+provider:reviewProvider.value,
+stars:reviewStars.value,
+text:reviewText.value
 });
 
-localStorage.setItem("reviews",JSON.stringify(reviews));
-
+save();
 loadReviews();
 loadAdminReviews();
 }
 
+/* LOAD REVIEWS */
 function loadReviews(){
-let list=document.getElementById("reviewList");
-list.innerHTML="";
+reviewList.innerHTML="";
 
 reviews.forEach(r=>{
+
 let li=document.createElement("li");
-li.innerHTML=`${r.trade} - ${r.stars} - ${r.text}`;
-list.appendChild(li);
+
+li.innerHTML=`
+${r.provider} - ${r.stars}<br>
+${r.text}
+`;
+
+reviewList.appendChild(li);
 });
 }
 
 /* ADMIN REVIEWS */
 function loadAdminReviews(){
-let list=document.getElementById("adminReviews");
-list.innerHTML="";
+if(!isAdmin()) return;
+
+adminReviews.innerHTML="";
 
 reviews.forEach((r,i)=>{
+
 let li=document.createElement("li");
 
 li.innerHTML=`
-${r.trade} - ${r.stars}
-<button onclick="deleteReview(${i})">Delete</button>
+${r.provider} - ${r.stars}
+<button class="delete-btn" onclick="deleteReview(${i})">Delete</button>
 `;
 
-list.appendChild(li);
+adminReviews.appendChild(li);
 });
 }
 
 function deleteReview(i){
-
-if(!isAdmin()){
-alert("Only admin can delete reviews");
-return;
-}
-
+if(!isAdmin()) return;
 reviews.splice(i,1);
-localStorage.setItem("reviews",JSON.stringify(reviews));
-
+save();
 loadReviews();
 loadAdminReviews();
 }
 
 /* INIT */
-loadUsers();
-loadReviews();
-loadAdminReviews();
+loadOptions();
 
 </script>
 
