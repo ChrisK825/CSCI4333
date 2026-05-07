@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 
 app.use(express.json());
-app.use(express.static("public")); // your HTML goes in /public
+app.use(express.static("public"));
 
 // -------------------- DATA --------------------
 let users = [
@@ -12,6 +12,7 @@ let users = [
 let jobs = [];
 let reviews = [];
 let trades = ["Plumbing", "Electrical", "HVAC", "Cleaning", "Mechanic", "Carpenter"];
+let payments = []; // ✅ FIX: missing in your backend
 
 // -------------------- USERS --------------------
 app.get("/api/users", (req, res) => {
@@ -19,7 +20,10 @@ app.get("/api/users", (req, res) => {
 });
 
 app.post("/api/signup", (req, res) => {
-  users.push({ id: Date.now(), ...req.body });
+  users.push({
+    id: Date.now(),
+    ...req.body
+  });
   res.json({ success: true });
 });
 
@@ -75,6 +79,19 @@ app.post("/api/trades", (req, res) => {
 
 app.delete("/api/trades/:index", (req, res) => {
   trades.splice(req.params.index, 1);
+  res.json({ success: true });
+});
+
+// -------------------- PAYMENTS (FIX) --------------------
+app.get("/api/payments", (req, res) => {
+  res.json(payments);
+});
+
+app.post("/api/payments", (req, res) => {
+  payments.push({
+    id: Date.now(),
+    ...req.body
+  });
   res.json({ success: true });
 });
 
