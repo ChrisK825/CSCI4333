@@ -54,6 +54,12 @@ app.post("/api/reviews", (req, res) => {
   res.json({ success: true });
 });
 
+app.delete("/api/reviews/:id", (req, res) => {
+  const id = Number(req.params.id);
+  reviews = reviews.filter(r => r.id !== id);
+  res.json({ success: true });
+});
+
 // -------------------- TRADES --------------------
 app.get("/api/trades", (req, res) => {
   res.json(trades);
