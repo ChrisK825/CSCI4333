@@ -195,6 +195,7 @@ async function loadData() {
   loadJobs();
   loadUsers();
   loadAdminJobs();
+  loadAdminReviews();
   loadPayments();
   loadReviews();
 }
@@ -413,28 +414,43 @@ function loadAdminJobs() {
   });
 }
 
-/* ---------------- PAYMENTS ---------------- */
-function loadPayments() {
+/* ---------------- ADMIN REVIEWS ---------------- */
+function loadAdminJobs() {
   if (!isAdmin()) return;
 
-  adminPayments.innerHTML = "";
-  let total = 0;
+  adminJobs.innerHTML = "";
 
-  payments.forEach(p => {
-    total += Number(p.amount);
-
+  jobs.forEach(j => {
     let li = document.createElement("li");
+
     li.innerHTML = `
-      Job ${p.jobId}<br>
-      $${p.amount}<br>
-      ${p.client} → ${p.provider}
-      <hr>
+      <strong>${j.category}</strong><br>
+      ${j.client}<br>
+      ${j.desc}<br>
+      Status: ${j.status}
     `;
 
-    adminPayments.appendChild(li);
+    adminJobs.appendChild(li);
   });
+}
 
-  totalRevenue.innerText = "Total Revenue: $" + total.toFixed(2);
+/* ---------------- PAYMENTS ---------------- */
+function loadAdminReviews() {
+  if (!isAdmin()) return;
+
+  adminReviews.innerHTML = "";
+
+  reviews.forEach(r => {
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      ${r.provider} - ${r.stars}<br>
+      ${r.text}<br>
+      <button class="delete-btn" onclick="deleteReview(${r.id})">Delete</button>
+    `;
+
+    adminReviews.appendChild(li);
+  });
 }
 
 /* ---------------- REVIEWS ---------------- */
@@ -444,6 +460,14 @@ async function submitReview() {
     stars: reviewStars.value,
     text: reviewText.value
   });
+
+  loadData();
+}
+
+async function deleteReview(id) {
+  if (!isAdmin()) return;
+
+  await api.del(`/api/reviews/${id}`);
 
   loadData();
 }

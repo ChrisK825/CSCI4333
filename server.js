@@ -50,7 +50,10 @@ app.get("/api/reviews", (req, res) => {
 });
 
 app.post("/api/reviews", (req, res) => {
-  reviews.push(req.body);
+  reviews.push({
+    id: Date.now(),
+    ...req.body
+  });
   res.json({ success: true });
 });
 
