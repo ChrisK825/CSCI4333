@@ -420,26 +420,6 @@ function loadAdminJobs() {
 }
 
 /* ---------------- ADMIN REVIEWS ---------------- */
-function loadAdminJobs() {
-  if (!isAdmin()) return;
-
-  adminJobs.innerHTML = "";
-
-  jobs.forEach(j => {
-    let li = document.createElement("li");
-
-    li.innerHTML = `
-      <strong>${j.category}</strong><br>
-      ${j.client}<br>
-      ${j.desc}<br>
-      Status: ${j.status}
-    `;
-
-    adminJobs.appendChild(li);
-  });
-}
-
-/* ---------------- PAYMENTS ---------------- */
 function loadAdminReviews() {
   if (!isAdmin()) return;
 
@@ -456,6 +436,30 @@ function loadAdminReviews() {
 
     adminReviews.appendChild(li);
   });
+}
+
+/* ---------------- PAYMENTS ---------------- */
+function loadPayments() {
+  if (!isAdmin()) return;
+
+  adminPayments.innerHTML = "";
+  let total = 0;
+
+  payments.forEach(p => {
+    total += Number(p.amount);
+
+    let li = document.createElement("li");
+    li.innerHTML = `
+      Job ${p.jobId}<br>
+      $${p.amount}<br>
+      ${p.client} → ${p.provider}
+      <hr>
+    `;
+
+    adminPayments.appendChild(li);
+  });
+
+  totalRevenue.innerText = "Total Revenue: $" + total.toFixed(2);
 }
 
 /* ---------------- REVIEWS ---------------- */
