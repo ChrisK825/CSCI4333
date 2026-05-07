@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatchingSupplyWithDemands.com</title>
+
+<style>
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f8;
+}
+
+header{
+background:#1e3a5f;
+color:#fff;
+padding:20px;
+text-align:center;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+padding:20px;
+}
+
+.card{
+background:#fff;
+padding:20px;
+border-radius:12px;
+margin-top:20px;
+box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+input,select,textarea{
+width:100%;
+padding:10px;
+margin:8px 0;
+border-radius:8px;
+border:1px solid #ccc;
+box-sizing:border-box;
+}
+
+button{
+background:#1e3a5f;
+color:#fff;
+padding:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-top:5px;
+}
+
+button:hover{opacity:.9;}
+
+.hidden{display:none;}
+.delete-btn{background:#b22222;}
+.logout-btn{background:#b22222;}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>MatchingSupplyWithDemands.com</h1>
+</header>
+
+<div class="container">
+
+<!-- REQUEST -->
+<section class="card">
+<h2>Create Job Request</h2>
+
+<form onsubmit="submitRequest(event)">
+<input id="name" placeholder="Client Name" required>
+<select id="category"></select>
+<input id="budget" type="number" placeholder="Budget">
+<textarea id="desc" placeholder="Job description"></textarea>
+<button type="submit">Submit</button>
+</form>
+</section>
+
+<!-- LOGIN -->
+<section class="card">
+<h2>Login</h2>
+<input id="loginName" placeholder="Name">
+<input id="loginPass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="card hidden">
+<h2>Dashboard</h2>
+<p id="welcome"></p>
+<button class="logout-btn" onclick="logout()">Logout</button>
+
+<h3>Jobs</h3>
+<ul id="jobList"></ul>
+</section>
+
+<!-- SIGNUP -->
+<section class="card">
+<h2>Sign Up</h2>
+<input id="signupName" placeholder="Name">
+<input id="signupPass" type="password" placeholder="Password">
+<select id="signupRole"></select>
+<button onclick="signup()">Create Account</button>
+</section>
+
+<!-- ADMIN -->
+<section id="admin" class="card hidden">
+<h2>ADMIN PANEL</h2>
+
+<h3>Create New Trade</h3>
+<input id="newTrade" placeholder="New trade">
+<button onclick="addTrade()">Add Trade</button>
+
+<h3>Trades</h3>
+<ul id="tradeList"></ul>
+
+<h3>Users</h3>
+<ul id="userList"></ul>
+
+<h3>All Jobs</h3>
+<ul id="adminJobs"></ul>
+
+<h3>Reviews</h3>
+<ul id="adminReviews"></ul>
+
+<h3>Payments</h3>
+<p id="totalRevenue"></p>
+<ul id="adminPayments"></ul>
+</section>
+
+<!-- REVIEWS -->
+<section class="card">
+<h2>Reviews</h2>
+
+<select id="reviewProvider"></select>
+<select id="reviewStars">
+<option>5</option>
+<option>4</option>
+<option>3</option>
+<option>2</option>
+<option>1</option>
+</select>
+
+<textarea id="reviewText"></textarea>
+<button onclick="submitReview()">Submit Review</button>
+
+<h3>All Reviews</h3>
+<ul id="reviewList"></ul>
+</section>
+
+</div>
+
+<script>
+
+/* ---------------- STATE ---------------- */
+let currentUser = null;
+
+let trades = [];
+let users = [];
+let jobs = [];
+let payments = [];
+let reviews = [];
+
+/* ---------------- API HELPERS ---------------- */
+const api = {
+  get: (url) => fetch(url).then(r => r.json()),
+  post: (url, data) =>
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    }),
+  put: (url, data) =>
+    fetch(url, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    }),
+  del: (url) => fetch(url, { method: "DELETE" })
+};
+
+/* ---------------- LOAD ALL DATA ---------------- */
+async function loadData() {
+  trades = await api.get("/api/trades");
+  users = await api.get("/api/users");
+  jobs = await api.get("/api/jobs");
+  reviews = await api.get("/api/reviews");
+
+  loadOptions();
+  loadJobs();
+  loadUsers();
+  loadAdminJobs();
+  loadPayments();
+  loadReviews();
+}
+
+/* ---------------- ADMIN CHECK ---------------- */
+function isAdmin() {
+  return currentUser && currentUser.role === "admin";
+}
+
+/* ---------------- DOM SAFE GET ---------------- */
+const $ = (id) => document.getElementById(id);
+
+/* ---------------- OPTIONS ---------------- */
+function loadOptions() {
+  ["category", "signupRole", "reviewProvider"].forEach(id => {
+    let el = $(id);
+    if (!el) return;
+
+    el.innerHTML = "";
+    trades.forEach(t => {
+      let opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      el.appendChild(opt);
+    });
+  });
+
+  renderTradeList();
+}
+
+/* ---------------- TRADES ---------------- */
+function renderTradeList() {
+  if (!isAdmin()) return;
+
+  tradeList.innerHTML = "";
+
+  trades.forEach((t, i) => {
+    let li = document.createElement("li");
+    li.innerHTML = `
+      ${t}
+      <button class="delete-btn" onclick="deleteTrade(${i})">Delete</button>
+    `;
+    tradeList.appendChild(li);
+  });
+}
+
+async function addTrade() {
+  if (!isAdmin()) return;
+
+  let t = newTrade.value.trim();
+  if (!t) return;
+
+  await api.post("/api/trades", { trade: t });
+
+  newTrade.value = "";
+  loadData();
+}
+
+async function deleteTrade(i) {
+  if (!isAdmin()) return;
+  await api.del(`/api/trades/${i}`);
+  loadData();
+}
+
+/* ---------------- SIGNUP ---------------- */
+async function signup() {
+  await api.post("/api/signup", {
+    name: signupName.value,
+    password: signupPass.value,
+    role: signupRole.value
+  });
+
+  alert("Account created");
+  loadData();
+}
+
+/* ---------------- LOGIN ---------------- */
+function login() {
+  const user = users.find(u =>
+    u.name === loginName.value &&
+    u.password === loginPass.value
+  );
+
+  if (!user) return alert("Wrong login");
+
+  currentUser = user;
+
+  dashboard.classList.remove("hidden");
+  admin.classList.toggle("hidden", !isAdmin());
+
+  welcome.innerText = `Logged in as ${user.name} (${user.role})`;
+
+  loadJobs();
+}
+
+/* ---------------- LOGOUT ---------------- */
+function logout() {
+  location.reload();
+}
+
+/* ---------------- JOBS ---------------- */
+async function submitRequest(e) {
+  e.preventDefault();
+
+  const job = {
+    id: Date.now(),
+    client: $("name").value,
+    category: $("category").value,
+    budget: $("budget").value,
+    desc: $("desc").value,
+    status: "Pending",
+    acceptedBy: null,
+    paymentStatus: "Unpaid"
+  };
+
+  await api.post("/api/jobs", job);
+
+  alert("Job created");
+  e.target.reset();
+
+  loadData();
+}
+
+function loadJobs() {
+  if (!currentUser) return;
+
+  jobList.innerHTML = "";
+
+  jobs.forEach(job => {
+    let li = document.createElement("li");
+
+    li.innerHTML = `
+      <hr>
+      <strong>${job.category}</strong><br>
+      Client: ${job.client}<br>
+      ${job.desc}<br>
+      Budget: $${job.budget}<br>
+      Status: ${job.status}<br>
+      Provider: ${job.acceptedBy || "None"}<br>
+    `;
+
+    jobList.appendChild(li);
+  });
+}
+
+/* ---------------- JOB ACTIONS ---------------- */
+async function accept(id) {
+  const job = jobs.find(j => j.id === id);
+  if (!job || job.acceptedBy) return;
+
+  job.acceptedBy = currentUser.name;
+  job.status = "In Progress";
+
+  await api.put(`/api/jobs/${id}`, job);
+  loadData();
+}
+
+async function complete(id) {
+  const job = jobs.find(j => j.id === id);
+  job.status = "Completed";
+
+  await api.put(`/api/jobs/${id}`, job);
+  loadData();
+}
+
+async function pay(id) {
+  const job = jobs.find(j => j.id === id);
+  job.paymentStatus = "Paid";
+
+  await api.put(`/api/jobs/${id}`, job);
+
+  await api.post("/api/payments", {
+    jobId: job.id,
+    amount: job.budget,
+    client: job.client,
+    provider: job.acceptedBy
+  });
+
+  loadData();
+}
+
+/* ---------------- USERS ---------------- */
+function loadUsers() {
+  if (!isAdmin()) return;
+
+  userList.innerHTML = "";
+
+  users.forEach(u => {
+    let li = document.createElement("li");
+
+    li.innerHTML = `
+      ${u.name} (${u.role})
+    `;
+
+    userList.appendChild(li);
+  });
+}
+
+/* ---------------- ADMIN JOBS ---------------- */
+function loadAdminJobs() {
+  if (!isAdmin()) return;
+
+  adminJobs.innerHTML = "";
+
+  jobs.forEach(j => {
+    let li = document.createElement("li");
+
+    li.innerHTML = `
+      <strong>${j.category}</strong><br>
+      ${j.client}<br>
+      ${j.desc}<br>
+      Status: ${j.status}
+    `;
+
+    adminJobs.appendChild(li);
+  });
+}
+
+/* ---------------- PAYMENTS ---------------- */
+function loadPayments() {
+  if (!isAdmin()) return;
+
+  adminPayments.innerHTML = "";
+  let total = 0;
+
+  payments.forEach(p => {
+    total += Number(p.amount);
+
+    let li = document.createElement("li");
+    li.innerHTML = `
+      Job ${p.jobId}<br>
+      $${p.amount}<br>
+      ${p.client} → ${p.provider}
+      <hr>
+    `;
+
+    adminPayments.appendChild(li);
+  });
+
+  totalRevenue.innerText = "Total Revenue: $" + total.toFixed(2);
+}
+
+/* ---------------- REVIEWS ---------------- */
+async function submitReview() {
+  await api.post("/api/reviews", {
+    provider: reviewProvider.value,
+    stars: reviewStars.value,
+    text: reviewText.value
+  });
+
+  loadData();
+}
+
+function loadReviews() {
+  reviewList.innerHTML = "";
+
+  reviews.forEach(r => {
+    let li = document.createElement("li");
+    li.innerHTML = `
+      ${r.provider} - ${r.stars}<br>
+      ${r.text}
+    `;
+    reviewList.appendChild(li);
+  });
+}
+
+/* ---------------- INIT ---------------- */
+loadData();
+</script>
+
+</body>
+</html>
