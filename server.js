@@ -49,7 +49,10 @@ app.put("/api/jobs/:id", (req, res) => {
 });
 
 app.delete("/api/jobs/:id", (req, res) => {
-  jobs = jobs.filter(j => j.id != req.params.id);
+  const id = Number(req.params.id);
+
+  jobs = jobs.filter(j => Number(j.id) !== id);
+
   res.json({ success: true });
 });
 
