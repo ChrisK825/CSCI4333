@@ -190,14 +190,19 @@ async function loadData() {
   users = await api.get("/api/users");
   jobs = await api.get("/api/jobs");
   reviews = await api.get("/api/reviews");
+  payments = await api.get("/api/payments");
 
   loadOptions();
+
   loadJobs();
-  loadUsers();
-  loadAdminJobs();
-  loadAdminReviews();
-  loadPayments();
   loadReviews();
+
+  if (isAdmin()) {
+    loadUsers();
+    loadAdminJobs();
+    loadAdminReviews();
+    loadPayments();
+  }
 }
 
 /* ---------------- ADMIN CHECK ---------------- */
