@@ -27,6 +27,11 @@ app.post("/api/signup", (req, res) => {
   res.json({ success: true });
 });
 
+app.delete("/api/users/:id", (req, res) => {
+  users = users.filter(u => u.id != req.params.id);
+  res.json({ success: true });
+});
+
 // -------------------- JOBS --------------------
 app.get("/api/jobs", (req, res) => {
   res.json(jobs);

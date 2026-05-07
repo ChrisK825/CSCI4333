@@ -212,6 +212,12 @@ function isAdmin() {
 
 /* ---------------- DOM SAFE GET ---------------- */
 const $ = (id) => document.getElementById(id);
+const userList = $("userList");
+const adminJobs = $("adminJobs");
+const adminReviews = $("adminReviews");
+const adminPayments = $("adminPayments");
+const totalRevenue = $("totalRevenue");
+const jobList = $("jobList");
 
 /* ---------------- OPTIONS ---------------- */
 function loadOptions() {
@@ -293,7 +299,7 @@ function login() {
 
   welcome.innerText = `Logged in as ${user.name} (${user.role})`;
 
-  loadJobs();
+  loadData();
 }
 
 /* ---------------- LOGOUT ---------------- */
@@ -393,10 +399,21 @@ function loadUsers() {
 
     li.innerHTML = `
       ${u.name} (${u.role})
+      ${u.role !== "admin"
+        ? `<button class="delete-btn" onclick="deleteUser(${u.id})">Delete</button>`
+        : ""
+      }
     `;
 
     userList.appendChild(li);
   });
+}
+
+async function deleteUser(id) {
+  if (!isAdmin()) return;
+
+  await api.del(`/api/users/${id}`);
+  loadData();
 }
 
 /* ---------------- ADMIN JOBS ---------------- */
